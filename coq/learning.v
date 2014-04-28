@@ -354,4 +354,51 @@ Proof.
   rewrite -> negb_involutive.
   reflexivity.
   Qed.
-  
+
+(* Exercise andb_oq_orb *)
+Lemma orb_to_andb:
+  forall a b : bool,
+  orb a b = negb (andb (negb a) (negb b)).
+Proof.
+  intros a b. destruct a. destruct b.
+  reflexivity.
+  reflexivity.
+  destruct b.
+  reflexivity.
+  reflexivity.
+  Qed.
+
+Theorem de_morgan_1:
+  forall a b : bool,
+  negb (orb a b) = andb (negb a) (negb b).
+Proof.
+  intros a b. destruct a. destruct b.
+  reflexivity.
+  reflexivity.
+  destruct b.
+  reflexivity.
+  reflexivity.
+  Qed.
+
+Theorem de_morgan_2:
+  forall a b : bool,
+  negb (andb a b) = orb (negb a) (negb b).
+Proof.
+  intros a b. destruct a. destruct b.
+  reflexivity.
+  reflexivity.
+  destruct b.
+  reflexivity.
+  reflexivity.
+  Qed.
+
+Theorem andb_eq_orb : 
+  forall x y : bool,
+  (andb x y = orb x y) -> x = y.
+Proof.
+  intros x y.
+  destruct x. destruct y.
+  reflexivity.
+  simpl. intro H. rewrite H. reflexivity.
+  simpl. intro H. rewrite H. reflexivity.
+  Qed.
