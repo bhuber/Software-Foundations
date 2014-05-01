@@ -292,6 +292,343 @@ Proof.
         reflexivity.
 Qed.
 
+(* Exercise - optional more exercises *)
+
+(*
+Take a piece of paper. For each of the following
+theorems, first think about whether (a) it can be
+proved using only simplification and rewriting, (b) it
+also requires case analysis (destruct), or (c) it also
+requires induction. Write down your prediction. Then
+    fill in the proof. (There is no need to turn in
+    your piece of paper; this is just to encourage you
+    to reflect before hacking!)
+*)
+
+
+Theorem ble_nat_refl : forall n:nat,
+  true = ble_nat n n.
+Proof.
+    (* Guess: Induction required *)
+    intros n. induction n as [| n'].
+    Case "n = 0".
+        simpl. reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        reflexivity.
+Qed.
+
+Theorem zero_nbeq_S : forall n:nat,
+  beq_nat 0 (S n) = false.
+Proof.
+    (* Guess: simpl. *)
+    simpl. reflexivity.
+Qed.
+
+Theorem andb_false_r : forall b : bool,
+  andb b false = false.
+Proof.
+    (* Guess: destruct *)
+    intros b. destruct b.
+    simpl. reflexivity.
+    simpl. reflexivity.
+Qed.
+
+Theorem plus_ble_compat_l : forall n m p : nat, 
+  ble_nat n m = true -> ble_nat (p + n) (p + m) = true.
+Proof.
+    (* Guess: induction *)
+    intros n m p H. induction p as [| p'].
+    Case "p = 0".
+        simpl. rewrite -> H. reflexivity.
+    Case "p = S p'".
+        simpl.
+        rewrite -> IHp'.
+        reflexivity.
+Qed.
+
+Theorem S_nbeq_0 : forall n:nat,
+  beq_nat (S n) 0 = false.
+Proof.
+    (* Guess: simpl. *)
+    simpl. reflexivity.
+Qed.
+
+Theorem mult_1_l : forall n:nat, 1 * n = n.
+Proof.
+    (* Guess: simpl. *)
+    simpl.
+    intros n.
+    rewrite plus_0_r.
+    reflexivity.
+    (* Was really rewrite, and induction indirectly *)
+Qed.
+
+Theorem all3_spec : forall b c : bool,
+    orb
+      (andb b c)
+      (orb (negb b)
+               (negb c))
+  = true.
+Proof.
+    (* Guess: destruct *)
+    intros b c. destruct b.
+    simpl.
+    destruct c.
+    simpl. reflexivity.
+    simpl. reflexivity.
+    destruct c.
+    simpl. reflexivity.
+    simpl. reflexivity.
+Qed.
+
+Theorem mult_plus_distr_r : forall n m p : nat,
+  (n + m) * p = (n * p) + (m * p).
+Proof.
+    (* Guess: rewrite *)
+    intros n m p.
+    rewrite -> mult_comm.
+    rewrite -> mult_dist.
+    rewrite -> mult_comm.
+    assert (H: p * m = m * p).
+        Case "Proving assertion".
+        rewrite -> mult_comm.
+        reflexivity.
+    rewrite -> H.
+    reflexivity.
+Qed.
+
+Theorem mult_assoc : forall n m p : nat,
+  n * (m * p) = (n * m) * p.
+Proof.
+    (* Guess: Induction *)
+    intros n m p. induction n as [| n'].
+    Case "n = 0".
+        simpl.
+        reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        rewrite -> mult_plus_distr_r.
+        reflexivity.
+Qed.
+
+(** [] *)
+
+(** **** Exercise: 2 stars, optional (beq_nat_refl) *)
+(** Prove the following theorem.  Putting [true] on the left-hand side
+of the equality may seem odd, but this is how the theorem is stated in
+the standard library, so we follow suit.  Since rewriting 
+works equally well in either direction, we will have no 
+problem using the theorem no matter which way we state it. *)
+
+Theorem beq_nat_refl : forall n : nat, 
+  true = beq_nat n n.
+Proof.
+    intros n. induction n as [| n'].
+    Case "n = 0".
+        simpl. reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        reflexivity.
+Qed.
+
+(** [] *)
+
+(** **** Exercise: 2 stars, optional (plus_swap') *)
+(** The [replace] tactic allows you to specify a particular subterm to
+   rewrite and what you want it rewritten to.  More precisely,
+   [replace (t) with (u)] replaces (all copies of) expression [t] in
+   the goal by expression [u], and generates [t = u] as an additional
+   subgoal. This is often useful when a plain [rewrite] acts on the wrong
+   part of the goal.  
+
+   Use the [replace] tactic to do a proof of [plus_swap'], just like
+   [plus_swap] but without needing [assert (n + m = m + n)]. 
+*)
+
+Theorem plus_swap' : forall n m p : nat, 
+  n + (m + p) = m + (n + p).
+Proof.
+    intros n m p.
+    rewrite -> plus_assoc.
+    replace (n + m) with (m + n).
+    rewrite <- plus_assoc. reflexivity.
+    rewrite -> plus_comm. reflexivity.
+Qed.
+(** [] *)
+
+
+(** **** Exercise: 3 stars (binary_commute) *)
+(** Recall the [increment] and [binary-to-unary] functions that you
+    wrote for the [binary] exercise in the [Basics] chapter.  Prove
+    that these functions commute -- that is, incrementing a binary
+    number and then converting it to unary yields the same result as
+    first converting it to unary and then incrementing.
+
+    (Before you start working on this exercise, please copy the
+    definitions from your solution to the [binary] exercise here so
+    that this file can be graded on its own.  If you find yourself
+    wanting to change your original definitions to make the property
+    easier to prove, feel free to do so.) *)
+
+(* FILL IN HERE *)
+(** [] *)
+
+
+(** **** Exercise: 5 stars, advanced (binary_inverse) *)
+(** This exercise is a continuation of the previous exercise about
+    binary numbers.  You will need your definitions and theorems from
+    the previous exercise to complete this one.
+
+    (a) First, write a function to convert natural numbers to binary
+        numbers.  Then prove that starting with any natural number,
+        converting to binary, then converting back yields the same
+        natural number you started with.
+
+    (b) You might naturally think that we should also prove the
+        opposite direction: that starting with a binary number,
+        converting to a natural, and then back to binary yields the
+        same number we started with.  However, it is not true!
+        Explain what the problem is.
+
+    (c) Define a function [normalize] from binary numbers to binary
+        numbers such that for any binary number b, converting to a
+        natural and then back to binary yields [(normalize b)].  Prove
+        it.
+
+    Again, feel free to change your earlier definitions if this helps
+    here. 
+*)
+
+(* FILL IN HERE *)
+(** [] *)
+
+(* ###################################################################### *)
+(** * Advanced Material *)
+
+(** ** Formal vs. Informal Proof *)
+
+(** "Informal proofs are algorithms; formal proofs are code." *)
+
+(** The question of what, exactly, constitutes a "proof" of a
+    mathematical claim has challenged philosophers for millenia.  A
+    rough and ready definition, though, could be this: a proof of a
+    mathematical proposition [P] is a written (or spoken) text that
+    instills in the reader or hearer the certainty that [P] is true.
+    That is, a proof is an act of communication.
+
+    Now, acts of communication may involve different sorts of readers.
+    On one hand, the "reader" can be a program like Coq, in which case
+    the "belief" that is instilled is a simple mechanical check that
+    [P] can be derived from a certain set of formal logical rules, and
+    the proof is a recipe that guides the program in performing this
+    check.  Such recipes are _formal_ proofs.
+
+    Alternatively, the reader can be a human being, in which case the
+    proof will be written in English or some other natural language,
+    thus necessarily _informal_.  Here, the criteria for success are
+    less clearly specified.  A "good" proof is one that makes the
+    reader believe [P].  But the same proof may be read by many
+    different readers, some of whom may be convinced by a particular
+    way of phrasing the argument, while others may not be.  One reader
+    may be particularly pedantic, inexperienced, or just plain
+    thick-headed; the only way to convince them will be to make the
+    argument in painstaking detail.  But another reader, more familiar
+    in the area, may find all this detail so overwhelming that they
+    lose the overall thread.  All they want is to be told the main
+    ideas, because it is easier to fill in the details for themselves.
+    Ultimately, there is no universal standard, because there is no
+    single way of writing an informal proof that is guaranteed to
+    convince every conceivable reader.  In practice, however,
+    mathematicians have developed a rich set of conventions and idioms
+    for writing about complex mathematical objects that, within a
+    certain community, make communication fairly reliable.  The
+    conventions of this stylized form of communication give a fairly
+    clear standard for judging proofs good or bad.
+
+    Because we are using Coq in this course, we will be working
+    heavily with formal proofs.  But this doesn't mean we can ignore
+    the informal ones!  Formal proofs are useful in many ways, but
+    they are _not_ very efficient ways of communicating ideas between
+    human beings. *)
+
+(** For example, here is a proof that addition is associative: *)
+
+Theorem plus_assoc' : forall n m p : nat,
+  n + (m + p) = (n + m) + p.
+Proof. intros n m p. induction n as [| n']. reflexivity. 
+  simpl. rewrite -> IHn'. reflexivity.  Qed.
+
+(** Coq is perfectly happy with this as a proof.  For a human,
+    however, it is difficult to make much sense of it.  If you're used
+    to Coq you can probably step through the tactics one after the
+    other in your mind and imagine the state of the context and goal
+    stack at each point, but if the proof were even a little bit more
+    complicated this would be next to impossible.  Instead, a
+    mathematician might write it something like this: *)
+(** - _Theorem_: For any [n], [m] and [p],
+      n + (m + p) = (n + m) + p.
+    _Proof_: By induction on [n].
+
+    - First, suppose [n = 0].  We must show 
+        0 + (m + p) = (0 + m) + p.  
+      This follows directly from the definition of [+].
+
+    - Next, suppose [n = S n'], where
+        n' + (m + p) = (n' + m) + p.
+      We must show
+        (S n') + (m + p) = ((S n') + m) + p.
+      By the definition of [+], this follows from
+        S (n' + (m + p)) = S ((n' + m) + p),
+      which is immediate from the induction hypothesis. [] *)
+
+(** The overall form of the proof is basically similar.  This is
+    no accident: Coq has been designed so that its [induction] tactic
+    generates the same sub-goals, in the same order, as the bullet
+    points that a mathematician would write.  But there are
+    significant differences of detail: the formal proof is much more
+    explicit in some ways (e.g., the use of [reflexivity]) but much
+    less explicit in others (in particular, the "proof state" at any
+    given point in the Coq proof is completely implicit, whereas the
+    informal proof reminds the reader several times where things
+    stand). *)
+
+(** Here is a formal proof that shows the structure more
+    clearly: *)
+
+Theorem plus_assoc'' : forall n m p : nat,
+  n + (m + p) = (n + m) + p.
+Proof.
+  intros n m p. induction n as [| n']. 
+  Case "n = 0".
+    reflexivity. 
+  Case "n = S n'".
+    simpl. rewrite -> IHn'. reflexivity.   Qed.
+
+(** **** Exercise: 2 stars, advanced (plus_comm_informal) *)
+(** Translate your solution for [plus_comm] into an informal proof. *)
+
+(** Theorem: Addition is commutative.
+ 
+    Proof: (* FILL IN HERE *)
+[]
+*)
+
+(** **** Exercise: 2 stars, optional (beq_nat_refl_informal) *)
+(** Write an informal proof of the following theorem, using the
+    informal proof of [plus_assoc] as a model.  Don't just
+    paraphrase the Coq tactics into English!
+ 
+    Theorem: [true = beq_nat n n] for any [n].
+    
+    Proof: (* FILL IN HERE *)
+[]
+ *)
+
+(* $Date: 2013-07-17 16:19:11 -0400 (Wed, 17 Jul 2013) $ *)
 
 
 
