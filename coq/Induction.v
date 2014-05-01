@@ -115,6 +115,8 @@ Proof.
   Case "n = S n'".
     simpl. rewrite -> IHn'. reflexivity. Qed.
 
+(* Exercise - Basic Induction *)
+
 Theorem mult_0_r : forall n:nat,
   n * 0 = 0.
 Proof.
@@ -165,4 +167,133 @@ Proof.
         rewrite -> IHn'.
         reflexivity.
 Qed.
+
+(* Exercise - double plus *)
+Fixpoint double (n:nat) :=
+  match n with
+  | O => O
+  | S n' => S (S (double n'))
+  end.
+
+Lemma double_plus : forall n, double n = n + n .
+Proof.
+    intros n. induction n as [| n'].
+    Case "n = 0".
+        reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        rewrite -> plus_n_Sm.
+        reflexivity.
+Qed.
+
+Theorem mult_0_plus' : forall n m : nat,
+  (0 + n) * m = n * m.
+Proof.
+  intros n m.
+  assert (H: 0 + n = n).
+    Case "Proof of assertion". reflexivity.
+  rewrite -> H.
+  reflexivity.
+Qed.
+
+Theorem plus_rearrange : forall n m p q : nat,
+  (n + m) + (p + q) = (m + n) + (p + q).
+Proof.
+  intros n m p q.
+  assert (H: n + m = m + n).
+    Case "Proof of assertion".
+    rewrite -> plus_comm. reflexivity.
+  rewrite -> H. reflexivity. Qed.
+
+(* Exercise - mult_comm *)
+
+Theorem plus_swap : forall n m p : nat,
+    n + (m + p) = m + (n + p).
+Proof.
+    intros n m p.
+    rewrite -> plus_assoc.
+    assert (H: n + m = m + n).
+        Case "Proof by assertion".
+        rewrite -> plus_comm. reflexivity.
+    rewrite -> H.
+    rewrite <- plus_assoc.
+    reflexivity.
+Qed.
+
+Theorem mult_dist : forall n m p : nat,
+    n * (m + p) = n * m + n * p.
+Proof.
+    intros n m p. induction n as [| n'].
+    Case "n = 0".
+        rewrite -> mult_0_1.
+        reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        assert (H: p + (n' * m + n' * p) = n' * m + (p + n' * p)).
+            SCase "Proving Assertion".
+            rewrite -> plus_swap.
+            reflexivity.
+        rewrite <- plus_assoc.
+        rewrite -> H.
+        rewrite -> plus_assoc.
+        reflexivity.
+Qed.
+
+Theorem mult_1_r: forall n : nat,
+    n * 1 = n.
+Proof.
+    intros n. induction n as [| n'].
+    Case "n = 0".
+        simpl. reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        reflexivity.
+Qed.
+
+Theorem mult_comm : forall m n : nat,
+    m * n = n * m.
+Proof.
+    intros m n. induction m as [| m'].
+    Case "m = 0".
+        rewrite -> mult_0_1.
+        rewrite -> mult_0_r.
+        reflexivity.
+    Case "m = S m'".
+        simpl.
+        rewrite -> IHm'.
+        assert (H: n * S m' = n * (1 + m')).
+            SCase "Proof by assertion".
+            simpl.
+            reflexivity.
+        rewrite -> H.
+        rewrite -> mult_dist.
+        rewrite -> mult_1_r.
+        reflexivity.
+Qed.
+
+(* Exercise - evenb_n__oddb_Sn *)
+Theorem evenb_n__oddb_Sn : forall n : nat,
+    evenb n = negb (evenb (S n)).
+Proof.
+    intros n. induction n as [| n'].
+    Case "n = 0".
+        simpl.
+        reflexivity.
+    Case "n = S n'".
+        simpl.
+        rewrite -> IHn'.
+        destruct n'.
+        reflexivity.
+        simpl.
+        rewrite -> negb_involutive.
+        reflexivity.
+Qed.
+
+
+
+
+
 
