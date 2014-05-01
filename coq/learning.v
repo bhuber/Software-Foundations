@@ -402,3 +402,93 @@ Proof.
   simpl. intro H. rewrite H. reflexivity.
   simpl. intro H. rewrite H. reflexivity.
   Qed.
+
+(* Exercise - Binary *)
+Inductive bin : Type :=
+    | BO : bin
+    | D : bin -> bin
+    | BS : bin -> bin.
+
+(*
+* 0   | O
+* 1   | S O
+* 10  | D S O
+* 11  | S D S O
+* 100 | D D S O
+* 101 | S D D S O
+* 110 | D S D S O
+* 111 | S D S D S O
+* 1000  | D D D S O
+* 1001  | S D D D S O
+* 1010  | D S D D S O
+* 1011  | S D S D D S O
+* 1100  | D D S D S O
+*)
+Fixpoint incb (b:bin) : bin :=
+    match b with
+    | BO => BS BO
+    | BS BO => D (BS BO)
+    | BS (BS n') => (D n')
+    | D n' => BS (D n')
+    | BS (D n') => D (incb n')
+    end.
+
+Fixpoint bin_to_nat (b:bin) : nat :=
+    match b with
+    | BO => O
+    | BS n' => S (bin_to_nat n')
+    | D n' => (mult (S (S O)) (bin_to_nat n'))
+    end.
+
+Example test_bin1: (incb BO) = (BS BO).
+Proof. reflexivity. Qed.
+Example test_bin2: (incb (BS BO)) = (D (BS BO)).
+Proof. reflexivity. Qed.
+Example test_bin3: (incb (D (BS BO))) = (BS (D (BS BO))).
+Proof. reflexivity. Qed.
+Example test_bin4: (incb (BS (D (BS BO)))) = (D (D (BS BO))).
+Proof. reflexivity. Qed.
+Example test_bin5: (incb (D (D (BS BO)))) = (BS (D (D (BS BO)))).
+Proof. reflexivity. Qed.
+Example test_bin6: (incb (BS (D (D (BS BO))))) = (D (BS (D (BS BO)))).
+Proof. reflexivity. Qed.
+Example test_bin7: (incb (D (BS (D (BS BO))))) = (BS (D (BS (D (BS BO))))).
+Proof. reflexivity. Qed.
+Example test_bin8: (incb (BS (D (BS (D (BS BO)))))) = (D (D (D (BS BO)))).
+Proof. reflexivity. Qed.
+
+
+Example test_bin_to_nat_0: (bin_to_nat BO) = O.
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_1: (bin_to_nat (BS BO)) = S O.
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_2: (bin_to_nat (D (BS BO))) = S (S O).
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_3: (bin_to_nat (BS (D (BS BO)))) = S (S (S O)).
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_4: (bin_to_nat (D (D (BS BO)))) = S (S (S (S O))).
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_7: (bin_to_nat (BS (D (BS (D (BS BO)))))) = 
+    S (S (S (S (S (S (S O)))))).
+Proof. reflexivity. Qed.
+Example test_bin_to_nat_8: (bin_to_nat (incb (BS (D (BS (D (BS BO))))))) = 
+    S (bin_to_nat (BS (D (BS (D (BS BO)))))).
+Proof. reflexivity. Qed.
+
+(*
+Theorem bin_inc1:
+    forall b:bin,
+    (bin_to_nat (incb (BS b))) = S (S (bin_to_nat b)).
+Proof.
+    intros b. destruct b.
+    simpl. reflexivity.
+    simpl. reflexivity.
+
+Theorem bin_inc:
+    forall b:bin,
+    (bin_to_nat (incb b)) = (S (bin_to_nat b)).
+Proof.
+    intros b. destruct b as [| odd | even].
+    simpl. reflexivity.
+    simpl. reflexivity.
+*)
