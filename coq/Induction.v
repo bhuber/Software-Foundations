@@ -475,6 +475,73 @@ Qed.
     easier to prove, feel free to do so.) *)
 
 (* FILL IN HERE *)
+
+Fixpoint incb (b:bin) : bin :=
+    match b with
+    | BO => BS BO
+    | BS BO => D (BS BO)
+    | BS (BS BO) => BS (D (BS BO))
+    | BS (BS n') => BS (D n')
+    | D n' => BS (D n')
+    | BS (D n') => D (incb n')
+    end.
+
+Fixpoint bin_to_nat (b:bin) : nat :=
+    match b with
+    | BO => O
+    | BS n' => S (bin_to_nat n')
+    | D n' => (plus (bin_to_nat n') (bin_to_nat n'))
+    end.
+
+Theorem binary_commute: forall b:bin,
+    (bin_to_nat (incb b)) = (S (bin_to_nat b)).
+Proof.
+    intros b. induction b as [b0 | be | bo].
+    Case "b = 0".
+        simpl.
+        reflexivity.
+    Case "b is even".
+        simpl.
+        reflexivity.
+    Case "b is odd".
+        induction incb as [bn1 | bn2 | bn3].
+        simpl. reflexivity.
+        simpl. rewrite <- IHbo0.
+        destruct bo.
+
+        assert (H1: bin_to_nat (BS bo) = S (bin_to_nat bo)).
+        SCase "Proving Assertion H1".
+            simpl. reflexivity.
+        rewrite -> H1.
+        simpl.
+        (* assert (H2: bin_to_nat (incb (BS bo)) = bin_to_nat (BS (BS bo))). *)
+        assert (H2: incb (BS bo) = BS (BS bo)).
+            simpl.
+            destruct bo.
+            simpl.
+            replace (D (BS BO) = BS (BS BO)) with (incb (D (BS BO)) = incb (D (BS BO))).
+            simpl. reflexivity.
+        SCase "Proving Assertion H2".
+            simpl.
+            destruct bo as [| boe | boo].
+            simpl.
+            assert (Ht: incb (D (BS BO)) = incb (BS (BS BO))).
+                simpl. reflexivity.
+
+        simpl.
+        induction bo.
+        simpl. reflexivity.
+        simpl. rewrite -> IHbo0.
+        rewrite -> H1.
+        rewrite <- IHbo.
+
+        rewrite -> H2.
+        destruct bo.
+Qed.
+
+
+
+
 (** [] *)
 
 
